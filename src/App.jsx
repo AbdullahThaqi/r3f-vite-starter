@@ -24,7 +24,7 @@ function Feather(props) {
     const gravityForce = gravity * (1 - height / 10000);
 
     const dragForce = !vacuum
-      ? 0.5 * 1.225 * 1.2 * 0.001 * velocity.lengthSq()
+      ? 0.5 * 1.225 * 1.2 * 0.0012 * velocity.lengthSq()
       : 0;
 
     const acceleration = gravityForce - dragForce / 0.0008;
@@ -193,7 +193,7 @@ function CameraAnimation({ simulationStarted }) {
     if (simulationStarted && movementStartTime !== null && movementEndTime !== null) {
       if(!vacuum){
         setMovementTime(timeWithDrag(0.8, gravity, 0.02259, height + 10));
-        setMovementTime2(timeWithDrag(0.0008, gravity, 0.000735, height + 10));
+        setMovementTime2(timeWithDrag(0.0008, gravity, 0.000882, height + 10));
       }
       else{
         setMovementTime(Math.sqrt(2 * height / gravity));
