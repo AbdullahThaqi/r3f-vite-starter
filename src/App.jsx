@@ -1,16 +1,14 @@
-import { Clone, Environment, Html, OrbitControls, PerspectiveCamera, useGLTF } from '@react-three/drei';
+import { PerspectiveCamera, useGLTF } from '@react-three/drei';
 import { Canvas, useFrame, useThree } from '@react-three/fiber';
 import { useEffect, useRef, useState } from 'react';
 import * as THREE from 'three';
-import { useBox, Physics, useSphere } from '@react-three/cannon';
 import { useConfigurator } from './components/Configurator';
 import UI from './UI.JSX';
-import { Debug } from '@react-three/cannon';
 
 
 function Feather(props) {
   const { nodes, materials } = useGLTF('/3_great_feathers_pack.glb');
-  const { height, simulationStarted, gravity, vacuum } = useConfigurator();
+  const { height, gravity, vacuum, radius } = useConfigurator();
 
   const initialPosition = [props.position[0], props.position[1], props.position[2]];
   const [position, setPosition] = useState(initialPosition);
@@ -21,7 +19,9 @@ function Feather(props) {
   useFrame((state, delta) => {
     if (!props.simulationStarted) return;
 
-    const gravityForce = gravity * (1 - height / 10000);
+    const gravityForce = gravity * Math.pow(1 / (1 + height / radius), 2);
+    console.log(gravityForce, "g");
+    
 
     const dragForce = !vacuum
       ? 0.5 * 1.225 * 1.2 * 0.0012 * velocity.lengthSq()
@@ -65,7 +65,7 @@ function Feather(props) {
 
 function Sfera(props) {
   const { nodes, materials } = useGLTF('/xxr_sphere_12.13.19.glb');
-  const { gravity, height, vacuum } = useConfigurator();
+  const { gravity, height, vacuum, radius } = useConfigurator();
   const [velocity, setVelocity] = useState(new THREE.Vector3(0, 0, 0));
   const initialPosition = [props.position[0], props.position[1], props.position[2]];
 
@@ -76,7 +76,7 @@ function Sfera(props) {
   useFrame((state, delta) => {
     if (!props.simulationStarted) return;
 
-    const gravityForce = gravity * (1 - height / 10000);
+    const gravityForce = gravity * Math.pow(1 / (1 + height / radius), 2);
     const dragForce = !vacuum
       ? 0.5 * 1.225 * 0.47 * 0.00785 * velocity.lengthSq()
       : 0;
@@ -137,7 +137,7 @@ function Glass(props) {
 
 function CameraAnimation({ simulationStarted }) {
   const { camera } = useThree();
-  const { gravity, height, vacuum, setMovementTime, setMovementTime2 } = useConfigurator();
+  const { gravity, height, vacuum, setMovementTime, setMovementTime2, radius } = useConfigurator();
   const targetPosition = new THREE.Vector3(0, 13 - height, 20);
   const originalPosition = new THREE.Vector3(0, 30, 20);
   const originaltarget = new THREE.Vector3(0, 30, 25);
@@ -151,7 +151,7 @@ function CameraAnimation({ simulationStarted }) {
       if (movementStartTime === null) {
         setMovementStartTime(clock.current.getElapsedTime());
       }
-      const gravityForce = gravity * (1 - height / 10000);
+      const gravityForce = gravity * Math.pow(1 / (1 + height / radius), 2);
       const dragForce = !vacuum
         ? 0.5 * 1.225 * 0.47 * 0.00785 * velocity.lengthSq()
         : 0;
@@ -166,7 +166,7 @@ function CameraAnimation({ simulationStarted }) {
       else if (Math.abs(camera.position.y - targetPosition.y) >= 10) {
         camera.position.y += velocity.y * delta;
       }
-      if (Math.abs(camera.position.y - targetPosition.y) < 0.1) {
+      if (Math.abs(camera.position.y - targetPosition.y) < 1) {
         if (movementEndTime === null) {
           setMovementEndTime(clock.current.getElapsedTime());
         }
@@ -192,15 +192,15 @@ function CameraAnimation({ simulationStarted }) {
   useEffect(() => {
     if (simulationStarted && movementStartTime !== null && movementEndTime !== null) {
       if(!vacuum){
-        setMovementTime(timeWithDrag(0.8, gravity, 0.02259, height + 10));
-        setMovementTime2(timeWithDrag(0.0008, gravity, 0.000882, height + 10));
+        setMovementTime(timeWithDrag(0.8, gravity, 0.02259, height));
+        setMovementTime2(timeWithDrag(0.0008, gravity, 0.000882, height));
       }
       else{
         setMovementTime(Math.sqrt(2 * height / gravity));
         setMovementTime2(Math.sqrt(2 * height / gravity));
       }
     }
-  }, [simulationStarted, movementStartTime, movementEndTime]);
+  }, [simulationStarted, movementStartTime, movementEndTime, gravity, height, vacuum]);
   
   return null;
 }
@@ -228,10 +228,8 @@ export function Table(props) {
 }
 
 export default function App() {
-  const { startSimulation, setStartSimulation } = useConfigurator();
+  const { startSimulation } = useConfigurator();
   const [backgroundColor, setBackgroundColor] = useState(new THREE.Color('white'));
-  const { gravity, height } = useConfigurator();
-
 
   useEffect(() => {
     if (startSimulation) {

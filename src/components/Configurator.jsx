@@ -7,13 +7,17 @@ export const ConfiguratorProvider = ({ children }) => {
   const [planet, setPlanet] = useState('earth');
   const [movementTime, setMovementTime] = useState(0);
   const [movementTime2, setMovementTime2] = useState(0);
+  const [radius, setRadius] = useState(6371000);
   useEffect(() => {
     if (planet === 'earth') {
       setGravity(9.81);
+      setRadius(6371000);
     } else if (planet === 'moon') {
       setGravity(1.62);
+      setRadius(1737000);
     } else if (planet === 'mars') {
       setGravity(3.71);
+      setRadius(3390000);
     }
   }, [planet]);
 
@@ -36,7 +40,9 @@ export const ConfiguratorProvider = ({ children }) => {
         movementTime,
         setMovementTime,
         movementTime2,
-        setMovementTime2
+        setMovementTime2,
+        radius,
+        setRadius
       }}
     >
       {children}
