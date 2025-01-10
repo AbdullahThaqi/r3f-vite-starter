@@ -137,7 +137,7 @@ function Glass(props) {
 
 function CameraAnimation({ simulationStarted }) {
   const { camera } = useThree();
-  const { gravity, height, vacuum, setMovementTime } = useConfigurator();
+  const { gravity, height, vacuum, setMovementTime, setMovementTime2 } = useConfigurator();
   const targetPosition = new THREE.Vector3(0, 13 - height, 20);
   const originalPosition = new THREE.Vector3(0, 30, 20);
   const originaltarget = new THREE.Vector3(0, 30, 25);
@@ -180,9 +180,25 @@ function CameraAnimation({ simulationStarted }) {
     }
   });
 
+  function timeWithDrag(mass, gravity, k, height) {
+    const sqrtMass = Math.sqrt(mass);
+    const sqrtGravityK = Math.sqrt(gravity * k);
+    const expTerm = Math.exp((k / mass) * height);
+    const coshInverse = Math.log(expTerm + Math.sqrt(expTerm ** 2 - 1)); // cosh^-1(x) = ln(x + sqrt(x^2 - 1))
+    return (sqrtMass / sqrtGravityK) * coshInverse;
+  }
+  
+
   useEffect(() => {
     if (simulationStarted && movementStartTime !== null && movementEndTime !== null) {
-      setMovementTime(movementEndTime - movementStartTime);
+      if(!vacuum){
+        setMovementTime(timeWithDrag(0.8, gravity, 0.02259, height + 10));
+        setMovementTime2(timeWithDrag(0.0008, gravity, 0.000735, height + 10));
+      }
+      else{
+        setMovementTime(Math.sqrt(2 * height / gravity));
+        setMovementTime2(Math.sqrt(2 * height / gravity));
+      }
     }
   }, [simulationStarted, movementStartTime, movementEndTime]);
   

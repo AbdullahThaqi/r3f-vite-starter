@@ -2,7 +2,7 @@ import { useConfigurator } from './components/Configurator'
 import { useState } from 'react'
 
 export default function UI({ }) {
-    const { movementTime, height, setHeight, vacuum, setVacuum, setStartSimulation, planet, setPlanet } = useConfigurator();
+    const { movementTime, height, setHeight, vacuum, setVacuum, setStartSimulation, planet, setPlanet, movementTime2 } = useConfigurator();
 
     const handleInputChange = (e) => {
         const value = e.target.value;
@@ -61,7 +61,14 @@ export default function UI({ }) {
                     <button
                         className="bg-green-500 text-white p-2 rounded"
                     >
-                        Time: {movementTime.toFixed(2)}
+                        Time (s): {movementTime.toFixed(2)}
+                    </button>
+                </div>
+                <div className="flex items-center justify-between mx-10 mt-5">
+                    <button
+                        className="bg-green-500 text-white p-2 rounded"
+                    >
+                        Time (f): {movementTime2.toFixed(2)}
                     </button>
                 </div>
             </div>

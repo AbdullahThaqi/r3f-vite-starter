@@ -6,6 +6,7 @@ export const ConfiguratorProvider = ({ children }) => {
   const [gravity, setGravity] = useState(9.81);
   const [planet, setPlanet] = useState('earth');
   const [movementTime, setMovementTime] = useState(0);
+  const [movementTime2, setMovementTime2] = useState(0);
   useEffect(() => {
     if (planet === 'earth') {
       setGravity(9.81);
@@ -33,7 +34,9 @@ export const ConfiguratorProvider = ({ children }) => {
         startSimulation,
         setStartSimulation,
         movementTime,
-        setMovementTime
+        setMovementTime,
+        movementTime2,
+        setMovementTime2
       }}
     >
       {children}
